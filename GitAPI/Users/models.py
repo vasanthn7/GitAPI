@@ -10,5 +10,8 @@ class users(models.Model):
     followers = models.IntegerField(default=None, null=False)
     following = models.IntegerField(default=None, null=False)
 
+    class Meta:
+        verbose_name_plural = "users"
+
     def __str__(self):
         return self.name
