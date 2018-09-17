@@ -6,6 +6,6 @@ router = routers.DefaultRouter()
 router.register('users', views.user_view)
 
 urlpatterns = [
-    path('',views.home, name='home')
-    # path(r'^users/', include(router.urls))
+    path('', include(router.urls)),
+    path(r'search/',views.home, name='home'),
 ]
