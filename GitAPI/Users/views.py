@@ -1,42 +1,34 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets,generics
 from .models import users
 from .serializers import user_serializers
 import requests
+import django_filters
+from rest_framework import filters
 
-from .models import users
-# Create your views here.
+# from .models import users
 
-class user_view(viewsets.ModelViewSet):
+class user_all(viewsets.ModelViewSet):
     queryset = users.objects.all()
     serializer_class = user_serializers
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('user', 'created')
 
+    def get_queryset(self):
+        return users.objects.all()
 
 def home(request):
     user = {}
     args = {}
     if 'username' in request.GET:
         username = request.GET['username']
-        # print("-------------request-------------")
-        # print(request)
-        #
-        # print("-----------request.GET-----------")
-        # print(request.GET)
         url = 'https://api.github.com/users/%s' % username
         response = requests.get(url)
-        # print("-------response.status_code------")
-        # print (response.status_code)
+
         if (response.status_code == 200):                                           #Check if valid Username
             user = response.json()
-            # print("-------------user-------------")
-            # print(user, type(user))
-            # print(user['login'])
-
             args = {'status':200, 'user': user}
-            # print("-------------response-------------")
-            # print(response)
-            # print("-------------response.json-------------")
-            # print(response.json())
+
             if(users.objects.filter(user=request.GET['username']).exists()):        #Check if entry exists
                 print("user exist")
                 user_update = users.objects.get(user=request.GET['username'])
@@ -65,6 +57,11 @@ def home(request):
             args = {'status':404,}
     return render(request, 'Users/home.html', args)
 
+# class user_filter(generics.ListAPIView):
+#     queryset = users.objects.all()
+#     serializer_class = user_serializers
+#     filter_backends = (filters.SearchFilter,)
+#     search_fields = ('user', 'created')
 
 # user = models.CharField(max_length=128, primary_key=True)
 # name = models.CharField(max_length=200, null=True, blank=True)

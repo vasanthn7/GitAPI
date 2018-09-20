@@ -7,6 +7,7 @@ class users(models.Model):
     email = models.EmailField(max_length=100,blank=True, null= True)
     public_repo = models.IntegerField()
     created = models.DateTimeField(default=None, null=False)
+    date_added = models.DateTimeField(auto_now_add=True)
     followers = models.IntegerField(default=None, null=False)
     following = models.IntegerField(default=None, null=False)
 
