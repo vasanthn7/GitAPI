@@ -5,14 +5,16 @@ from .serializers import user_serializers
 import requests
 import django_filters
 from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
-# from .models import users
+from decouple import config
 
 class user_all(viewsets.ModelViewSet):
     queryset = users.objects.all()
     serializer_class = user_serializers
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('user', 'created')
+    filter_backends = (DjangoFilterBackend,filters.SearchFilter,)
+    filter_fields = ('user', 'created', 'email')
+    search_fields = ('user', 'created', 'email')
 
     def get_queryset(self):
         return users.objects.all()
@@ -22,9 +24,15 @@ def home(request):
     args = {}
     if 'username' in request.GET:
         username = request.GET['username']
-        url = 'https://api.github.com/users/%s' % username
-        response = requests.get(url)
 
+        # Git OAuth token
+        # Generate Personal access tokens on github and replace values
+        username_auth = config('username_auth')
+        token_auth = config('token_auth')
+
+        url = 'https://api.github.com/users/%s' % username
+        response = requests.get(url, auth=(username_auth, token_auth))
+        print (response.json())
         if (response.status_code == 200):                                           #Check if valid Username
             user = response.json()
             args = {'status':200, 'user': user}
@@ -57,11 +65,6 @@ def home(request):
             args = {'status':404,}
     return render(request, 'Users/home.html', args)
 
-# class user_filter(generics.ListAPIView):
-#     queryset = users.objects.all()
-#     serializer_class = user_serializers
-#     filter_backends = (filters.SearchFilter,)
-#     search_fields = ('user', 'created')
 
 # user = models.CharField(max_length=128, primary_key=True)
 # name = models.CharField(max_length=200, null=True, blank=True)
