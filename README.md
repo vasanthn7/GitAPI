@@ -1,6 +1,7 @@
 # GitAPI
 Django Wrapper for Git Search(User) API
 
+
 ## Installation
 - Clone the repo
 - Create virtual environment for python3 and activate it.
